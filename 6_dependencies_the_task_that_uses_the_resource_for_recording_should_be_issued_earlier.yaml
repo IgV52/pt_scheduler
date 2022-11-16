@@ -1,0 +1,18 @@
+stage: 6
+tasks:
+    A: {priority: 1, target: R, write: Q, read: F}
+    B: {priority: 1, target: Y O K, write: R, read: W}
+    C: {priority: 1, target: J, write: F, read: R}
+    D: {priority: 2, target: X O P, write: R, read: Q}
+steps:
+-   extend: A B C D
+-   get: D
+-   done: D
+-   get: B
+-   done: B
+-   get: C
+-   done: C
+-   get: A
+
+-   get: 
+-   content:

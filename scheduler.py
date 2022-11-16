@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from itertools import chain
 
 
@@ -6,7 +6,7 @@ Task = namedtuple('Task', 'name priority target_set write_set read_set')
 
 
 class Scheduler:
-    STAGE = 5
+    STAGE = 6
 
     def __init__(self):
         self._res_block = None
@@ -51,14 +51,36 @@ class Scheduler:
         else:
             self._res_block.add(res_set)
     
+    def _create_graph(self):
+        data = defaultdict(list)
+        for tupl in self._task_queue:
+            data[str(tupl.priority)].append(tupl)
+        return data
+
+    def _depend_task(self, data, task):
+        if data:
+            node = {task: i for i in data
+                    for j in i.read_set
+                    if j in task.write_set}
+            if node:
+                return True
+            return False
+
     def _free_res(self, task):
         self._task_process.remove(task)
         if self._res_block:
-            self._res_block = self._res_block - task.write_set - task.read_set
+            self._res_block.difference_update(task.write_set, task.read_set)
 
     def _iter_variable(self):
         self._sorted_priority()
+        data = self._create_graph()
+        depend = [task for task in self._task_queue 
+        if self._depend_task(data[str(task.priority)],task) 
+        and self._search_free_res(task)]
         for task in self._task_queue:
+            if depend:
+                if task.priority == depend[0].priority:
+                    return depend[0]
             if self._search_free_res(task):
                 return task
 

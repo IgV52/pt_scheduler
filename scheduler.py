@@ -1,16 +1,17 @@
 from collections import namedtuple
+from itertools import chain
 
 
 Task = namedtuple('Task', 'name priority target_set write_set read_set')
 
 
 class Scheduler:
-    STAGE = 4
+    STAGE = 5
 
     def __init__(self):
+        self._res_block = None
         self._task_process = None
         self._task_queue = None
-        self._write_res_block = None
 
     @property
     def content(self):
@@ -30,28 +31,30 @@ class Scheduler:
     def get(self):
         if self._task_queue:
             task_pop = self._iter_variable()
-            self._add_write_res_block(task_pop.write_set)
-            self._task_queue.remove(task_pop)
-            if not self._task_process:
-                self._task_process = [task_pop]
-            else:
-                self._task_process.append(task_pop)
+            if task_pop:
+                self._add_res_block(task_pop.write_set, task_pop.read_set)
+                self._task_queue.remove(task_pop)
+                if not self._task_process:
+                    self._task_process = [task_pop]
+                else:
+                    self._task_process.append(task_pop)
             return task_pop
         return None
 
     def done(self, task):
         self._free_res(task)
 
-    def _add_write_res_block(self, write_set):
-        if not self._write_res_block:
-            self._write_res_block = {write for write in write_set}
+    def _add_res_block(self, res_write, res_read):
+        res_set = chain(res_read, res_write)
+        if not self._res_block:
+            self._res_block = {res for res in res_set}
         else:
-            self._write_res_block.add(write_set)
-
+            self._res_block.add(res_set)
+    
     def _free_res(self, task):
         self._task_process.remove(task)
-        if self._write_res_block:
-            self._write_res_block.difference_update(task.write_set)
+        if self._res_block:
+            self._res_block = self._res_block - task.write_set - task.read_set
 
     def _iter_variable(self):
         self._sorted_priority()
@@ -60,9 +63,9 @@ class Scheduler:
                 return task
 
     def _search_free_res(self, task):
-        if self._write_res_block:
-            for block_res in self._write_res_block:
-                if  block_res in task.write_set:
+        if self._res_block:
+            for block_res in self._res_block:
+                if  block_res in task.write_set or block_res in task.read_set:
                     return False
         return True
 

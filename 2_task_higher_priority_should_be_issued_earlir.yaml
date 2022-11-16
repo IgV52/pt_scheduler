@@ -1,0 +1,11 @@
+stage: 2
+tasks:
+    A: {priority: 1}
+    B: {priority: 2}
+steps:
+-   extend: A B
+-   get: B
+-   get: A
+
+-   get:
+-   content:

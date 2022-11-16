@@ -5,7 +5,7 @@ Task = namedtuple('Task', 'name priority target_set write_set read_set')
 
 
 class Scheduler:
-    STAGE = 1
+    STAGE = 2
 
     def __init__(self):
         self._task_queue = None
@@ -26,6 +26,7 @@ class Scheduler:
 
     def get(self):
         if self._task_queue:
+            self._sorted_priority
             task_pop = self._task_queue.pop(0)
             if not self._task_process:
                 self._task_process = [task_pop]
@@ -36,3 +37,7 @@ class Scheduler:
 
     def done(self, task):
         pass
+
+    def _sorted_priority(self):
+        self._task_queue = sorted(self._task_queue, 
+                            key=lambda x: x.priority, reverse=True)

@@ -1,0 +1,11 @@
+stage: 3
+tasks:
+    A: {priority: 1, target: X}
+    B: {priority: 2, target: Y O K}
+steps:
+-   extend: A B
+-   get: B
+-   reach: X
+
+-   get:
+-   content:

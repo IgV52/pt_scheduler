@@ -5,11 +5,11 @@ Task = namedtuple('Task', 'name priority target_set write_set read_set')
 
 
 class Scheduler:
-    STAGE = 2
+    STAGE = 3
 
     def __init__(self):
         self._task_queue = None
-        self._task_process = None
+        self._task_procces = None
 
     @property
     def content(self):
@@ -22,7 +22,9 @@ class Scheduler:
             self._task_queue.extend(task_queue)
 
     def reach(self, target_set):
-        pass
+        [self._task_queue.remove(task) for task in self._task_queue 
+        for target in target_set 
+        if target in task.target_set]
 
     def get(self):
         if self._task_queue:

@@ -1,0 +1,19 @@
+stage: 99  # after which stage this test works
+tasks:
+    TASK_WITH_ALL_FIELDS:  # task id
+        priority: 777
+        target: x y z  # space separated targets
+        write: w1 w2  # space separated resource writes
+        read: r1 r2  # space separated resource reads
+    TASK_WITH_DEFAULT_FIELDS_VALUES: {}
+    A: {}
+    B: {}
+steps:
+-   content:  # initially scheduler must be empty
+-   get:  # scheduler must return None when can't give task
+-   extend: A B  # add task A and B
+-   content: A B  # scheduler must contains added tasks
+-   reach: X Y  # reach targets X and Y
+-   get: A  # scheduler must give task A
+-   content: B  # scheduler must contains not running tasks
+-   done: A  # finish task A
